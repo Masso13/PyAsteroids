@@ -1,29 +1,33 @@
-from engine.classes import Entity
+from engine.classes import Entity, Hud
 
 class CollisionManager:
-    def __init__(self, masks, objects):
+    def __init__(self, masks, objectManager):
         self.masks = masks
-        self.objects = objects
+        self.objectManager = objectManager
     
     def collidingWith(self, object: Entity, _object: Entity):
-        return _object.getCollisionMask() in self.masks[object.getCollisionMask()] and object.element.colliderect(_object.element)
-    
+        try:
+            return _object.getCollisionMask() in self.masks[object.getCollisionMask()] and object.element.colliderect(_object.element)
+        except AttributeError:
+            return False
+
     def getCollisions(self, object):
         collisions = []
-        for _object in self.objects:
+        for _object in self.objectManager.objects:
             if _object != object and self.collidingWith(object, _object):
                 collisions.append(_object)
         return collisions
     
     def update(self):
-        for object in self.objects:
+        for object in self.objectManager.objects:
             if object.collision.mask in self.masks:
                 object.collision.colliding = self.getCollisions(object)
 
 class ObjectManager:
-    def __init__(self, screen):
+    def __init__(self, screen, hud):
         self.objects = []
         self.screen = screen
+        self.hud = hud
 
     def createObject(self, id: str, object: Entity, mask: str, x: float, y: float, r: int = 0):
         if not self.objectExists(id):
@@ -68,14 +72,40 @@ class ObjectManager:
     def getTotalObjects(self):
         return len(self.objects)
 
-    def __iter__(self):
-        self.i = 0
-        return self
+class HudManager:
+    def __init__(self, screen):
+        self.objects = []
+        self.screen = screen
     
-    def __next__(self):
-        if self.i < len(self.objects):
-            object = self.objects[self.i]
-            self.i += 1
-            return object
+    def update(self):
+        for object in self.objects:
+            object.update()
+
+    def sort(self):
+        _objects = self.objects.copy()
+        self.objects = []
+        while len(_objects) > 0:
+            object = max(_objects, key=lambda o: o.z_index)
+            self.objects.append(object)
+            _objects.pop(_objects.index(object))
+    
+    def createObject(self, id: str, object: Hud, x: float, y: float, z_index: int):
+        if not self.objectExists(id):
+            _object = object(x, y, z_index)
+            _object.id = id
+            _object.screen = self.screen
+            _object.parent = self
+            self.objects.append(_object)
+            self.sort()
         else:
-            raise StopIteration
+            raise "This object has already been instantiated"
+
+    def objectExists(self, id):
+        for object in self.objects:
+            if object.id == id:
+                return object
+        return False
+    
+    def deleteAllObjects(self):
+        del self.objects
+        self.objects = []

@@ -18,7 +18,14 @@ class Entity:
         return self.collision.mask
     
     def destroy(self):
-        self.parent.deleteObject(self.id)
+        try:
+            self.parent.deleteObject(self.id)
+        except Exception as e:
+            print(e)
+
+class Hud:
+    def __init__(self, x: float, y: float, z_index: int):
+        self.x, self.y, self.z_index = x, y, z_index
     
 class Scene:
     def __init__(self, parent):
@@ -26,3 +33,6 @@ class Scene:
 
     def createObject(self, id: str, object: Entity, mask: str, x: float, y: float, r: int = 0):
         self.parent.objects.createObject(id, object, mask, x, y, r)
+
+    def createHudObject(self, id: str, object: Hud, x: float, y: float, z_index: int):
+        self.parent.hud.createObject(id, object, x, y, z_index)

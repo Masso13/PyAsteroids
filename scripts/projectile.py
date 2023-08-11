@@ -11,5 +11,14 @@ class Projectile(Entity):
 
         if self.y < 0:
             self.destroy()
+        
+        collide = self.collision["Asteroid"]
+        if collide:
+            if collide.r <= self.r:
+                collide.destroy()
+            else:
+                collide.r /= 2
 
-        self.circle = pygame.draw.circle(self.screen, COLORS["yellow"], (self.x, self.y), self.r)
+            self.destroy()
+
+        self.element = pygame.draw.circle(self.screen, COLORS["light-blue"], (self.x, self.y), self.r)

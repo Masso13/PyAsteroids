@@ -1,17 +1,17 @@
 import pygame
 from pygame.locals import QUIT
 from engine.constants import WIDTH, HEIGHT, FPS, COLORS
-from engine.managers import CollisionManager, ObjectManager
+from engine.managers import CollisionManager, ObjectManager, HudManager
 from engine.classes import Scene
 
 class Engine:
     def __init__(self, masks, scene: Scene):
         pygame.init()
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
-        self.font = pygame.font.SysFont("arial", 20, True)
         self.clock = pygame.time.Clock()
 
-        self.objects = ObjectManager(self.screen)
+        self.hud = HudManager(self.screen)
+        self.objects = ObjectManager(self.screen, self.hud)
         self.collisions = CollisionManager(masks, self.objects)
         self.scene = scene(self)
     
@@ -32,5 +32,7 @@ class Engine:
             
             self.objects.update()
             self.collisions.update()
+            self.hud.update()
+            self.scene.update()
 
             pygame.display.flip()
