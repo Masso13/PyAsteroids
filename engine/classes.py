@@ -19,9 +19,13 @@ class Entity:
     
     def destroy(self):
         try:
+            
             self.parent.deleteObject(self.id)
         except Exception as e:
             print(e)
+    
+    def paused(self):
+        return self.parent.paused
 
 class Hud:
     def __init__(self, x: float, y: float, z_index: int):

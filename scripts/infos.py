@@ -1,5 +1,5 @@
 from engine.classes import Hud
-from engine import pygame, WIDTH, HEIGHT, COLORS
+from engine import pygame, WIDTH, COLORS
 from engine.fonts import ARIAL
 
 class Infos(Hud):
@@ -10,8 +10,11 @@ class Infos(Hud):
         self.energy = 100
     
     def update(self):
+        self.score = round(max(0, self.score))
+
         self.drawHealth(80, 15, 5)
         self.drawEnergy(80, 15, 5)
+        self.drawScore((WIDTH-40, 10))
 
     def drawHealth(self, w, h, p):
         percent = self.health / 100
@@ -32,3 +35,7 @@ class Infos(Hud):
 
         pygame.draw.rect(self.screen, COLORS["gray"], background_size)
         pygame.draw.rect(self.screen, COLORS["light-blue"], energy_size)
+    
+    def drawScore(self, position):
+        score_label = ARIAL.render(f"{self.score}", True, COLORS["white"])
+        self.screen.blit(score_label, position)

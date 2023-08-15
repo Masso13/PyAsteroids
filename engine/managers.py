@@ -28,6 +28,7 @@ class ObjectManager:
         self.objects = []
         self.screen = screen
         self.hud = hud
+        self.paused = False
 
     def createObject(self, id: str, object: Entity, mask: str, x: float, y: float, r: int = 0):
         if not self.objectExists(id):
@@ -42,7 +43,7 @@ class ObjectManager:
     def objectExists(self, id):
         for object in self.objects:
             if object.id == id:
-                return True
+                return object
         return False
     
     def update(self):
@@ -109,3 +110,12 @@ class HudManager:
     def deleteAllObjects(self):
         del self.objects
         self.objects = []
+    
+    def deleteObject(self, id):
+        if self.objectExists(id):
+            for i, object in enumerate(self.objects):
+                if object.id == id:
+                    self.objects.pop(i)
+                    return True
+        else:
+            raise "This object has not been instantiated"
